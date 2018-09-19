@@ -1,6 +1,6 @@
 # bigviz
 
-To launch the program, just execute the following scripts:
+To launch the program, just execute one of the following scripts:
 
 ```bash
 ./run_local.sh # local mode
