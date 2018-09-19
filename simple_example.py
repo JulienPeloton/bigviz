@@ -177,3 +177,5 @@ if __name__ == "__main__":
     # This is the place where you will pass those lists to the C routines.
     # Alternatively, you could save the data on disk and load it inside the
     # C program.
+    import hello_ext
+    print(hello_ext.greet())
