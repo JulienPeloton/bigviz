@@ -7,6 +7,6 @@ if [ ! -f $fn ]; then
   python create_point.py -npoints 20000 -filename test_data.fits
 fi
 
-# Octree - no part
+# Launch it locally
 spark-submit --master local[*] --packages $PACK \
     simple_example.py -fn $fn -hdu 1
