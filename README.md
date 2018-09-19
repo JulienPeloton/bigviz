@@ -3,5 +3,7 @@
 To launch the program, just execute the following script:
 
 ```bash
-./run.sh
+./run_local.sh # local mode
+
+./run_cluster.sh # cluster mode
 ```
