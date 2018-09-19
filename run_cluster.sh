@@ -5,7 +5,11 @@ fn=`pwd`"/test_data.fits"
 
 if [ ! -f $fn ]; then
   python create_point.py -npoints 2000000 -filename test_data.fits
+  hdfs dfs -put test_data.fits
 fi
+
+NAME=`whoami`
+fn="hdfs:///user/${NAME}/test_data.fits"
 
 # Launch it on 2 executors (34 cores)
 spark-submit --master spark://134.158.75.222:7077 --packages $PACK \
