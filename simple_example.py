@@ -60,9 +60,8 @@ def mean(partition: Iterator) -> Generator:
     >>> mylist = [[1., 2.], [3., 4.], [5., 6.], [7., 8.], [9., 10.]]
 
     Considering only 1 partition
-    >>> cf = CollapseFunctions()
     >>> myit = iter(mylist)
-    >>> list(cf.mean(myit))
+    >>> list(mean(myit))
     [(array([ 5.,  6.]), 5)]
 
     Distribute over 2 partitions
@@ -73,16 +72,6 @@ def mean(partition: Iterator) -> Generator:
     ...     lambda partition: cf.mean(partition)).collect()
     >>> print(data)
     [(array([ 2.,  3.]), 2), (array([ 7.,  8.]), 3)]
-
-    If there are empty partitions, it returns None for the empty ones.
-    >>> rdd = sc.parallelize(mylist, 6)
-    >>> cf = CollapseFunctions()
-    >>> data = rdd.mapPartitions(
-    ...     lambda partition: cf.mean(partition)).collect()
-    >>> centroids = [c[0] for c in data]
-    >>> print(centroids) # doctest: +NORMALIZE_WHITESPACE
-    [None, array([ 1.,  2.]), array([ 3.,  4.]), array([ 5.,  6.]),
-    array([ 7.,  8.]), array([  9.,  10.])]
 
     """
     # Unwrap the iterator
