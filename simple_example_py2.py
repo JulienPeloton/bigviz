@@ -13,8 +13,6 @@
 # limitations under the License.
 from pyspark.sql import SparkSession
 
-import numpy as np
-
 import argparse
 
 def quiet_logs(sc, log_level="ERROR"):
@@ -37,90 +35,6 @@ def quiet_logs(sc, log_level="ERROR"):
 
     logger.LogManager.getLogger("org"). setLevel(level)
     logger.LogManager.getLogger("akka").setLevel(level)
-
-def mean(partition):
-    """Compute the centroid of the partition.
-    It can be viewed as a k-means for k=1.
-
-    Parameters
-    ----------
-    partition : Iterator
-        Iterator over the elements of the Spark partition.
-
-    Returns
-    -------
-    Generator of (list, int)
-        Yield tuple with the centroid and the total number of points
-        in the partition. If the partition is empty, return (None, 0).
-
-    Examples
-    -------
-    List of coordinates (can be 2D, 3D, ..., nD)
-    >>> mylist = [[1., 2.], [3., 4.], [5., 6.], [7., 8.], [9., 10.]]
-
-    Considering only 1 partition
-    >>> myit = iter(mylist)
-    >>> list(mean(myit))
-    [(array([ 5.,  6.]), 5)]
-
-    Distribute over 2 partitions
-    >>> rdd = sc.parallelize(mylist, 2)
-
-    Compute the centroid for each partition
-    >>> data = rdd.mapPartitions(
-    ...     lambda partition: cf.mean(partition)).collect()
-    >>> print(data)
-    [(array([ 2.,  3.]), 2), (array([ 7.,  8.]), 3)]
-
-    """
-    # Unwrap the iterator
-    xyz = [*partition]
-    size = len(xyz)
-
-    # Compute the centroid only if the partition is not empty
-    if size > 0:
-        mean = np.mean(xyz, axis=0)
-    else:
-        mean = None
-
-    yield (mean, size)
-
-def scatter3d_mpl(x, y, z, radius=None):
-    """3D scatter plot from matplotlib.
-    Invoke show() or save the figure to get the result.
-
-    Parameters
-    ----------
-    x: list of float
-        X coordinate
-    y: list of float
-        Y coordinate
-    z: list of float
-        Z coordinate
-    radius: int/float or list of int/float, optional
-        If given, the size of the markers. Can be a single number
-        of a list of sizes (of the same length as the coordinates)
-
-    """
-    import pylab as pl
-    from mpl_toolkits.mplot3d import Axes3D
-
-    fig = pl.figure()
-    ax = Axes3D(fig)
-
-    # Size of the centroids
-    if radius is None:
-        rad = 10.
-    else:
-        assert len(radius) == len(x), "Wrong size!"
-        rad = radius
-
-    ax.scatter(x, y, z, c=z, s=rad)
-
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Z")
-    pl.show()
 
 def addargs(parser):
     """ Parse command line arguments for simple_example.py """
@@ -162,16 +76,12 @@ if __name__ == "__main__":
 
     # Apply a collapse function
     # Before, repartition our DataFrame to mimick a large data set.
-    data = df.repartition(256).rdd\
-        .mapPartitions(lambda partition: mean(partition))\
-        .collect()
+    data = df.repartition(256).rdd.collect()
 
     # Re-organise the data into lists of x, y, z coordinates
     x = [p[0][0] for p in data if p[0] is not None]
     y = [p[0][1] for p in data if p[0] is not None]
     z = [p[0][2] for p in data if p[0] is not None]
-    rad = np.array([p[1] for p in data if p[0] is not None])
-    # scatter3d_mpl(x, y, z, rad / np.max(rad) * 500)
 
     # This is the place where you will pass those lists to the C routines.
     # Alternatively, you could save the data on disk and load it inside the
