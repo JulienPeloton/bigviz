@@ -10,7 +10,10 @@ if [ ! -f $fn ]; then
   python create_point.py -npoints 20000 -filename test_data.fits
 fi
 
+# Uncomment for python2
+# export PYSPARK_PYTHON=python2.7
+
 # Launch it locally
 spark-submit --master local[*] --packages $PACK \
     --files hello_ext.cpython-36m-darwin.so \
-    simple_example.py -fn $fn -hdu 1
+    simple_example_py2.py -fn $fn -hdu 1
