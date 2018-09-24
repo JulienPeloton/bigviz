@@ -123,9 +123,9 @@ if __name__ == "__main__":
     data = df.repartition(256).rdd.mapPartitions(mean).collect()
 
     # Re-organise the data into lists of x, y, z coordinates
-    x = [p[0] for p in data if p is not None]
-    y = [p[1] for p in data if p is not None]
-    z = [p[2] for p in data if p is not None]
+    x = [p[0][0] for p in data if p[0] is not None]
+    y = [p[0][1] for p in data if p[0] is not None]
+    z = [p[0][2] for p in data if p[0] is not None]
 
     # This is the place where you will pass those lists to the C routines.
     # Alternatively, you could save the data on disk and load it inside the
